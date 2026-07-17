@@ -1,0 +1,115 @@
+// ada 2 oop: association dan polymorphism
+import java.util.Scanner;
+
+public class Main {
+
+    public static void main(String[] args) {
+        Perpustakaan perpustakaan = new Perpustakaan();
+
+        try (Scanner scanner = new Scanner(System.in)) {
+            boolean berjalan = true;
+
+            while (berjalan) {
+                tampilkanMenu();
+                int pilihan;
+
+                try {
+                    pilihan = Integer.parseInt(scanner.nextLine().trim());
+                } catch (NumberFormatException e) {
+                    System.out.println("Input tidak valid, masukkan angka menu yang benar.\n");
+                    continue; // kembali ke awal loop, tidak crash
+                }
+
+                switch (pilihan) {
+                    case 1 -> tambahBuku(scanner, perpustakaan);
+                    case 2 -> tambahAnggota(scanner, perpustakaan);
+                    case 3 -> pinjamBuku(scanner, perpustakaan);
+                    case 4 -> kembalikanBuku(scanner, perpustakaan);
+                    case 5 -> perpustakaan.tampilkanSemuaBuku();
+                    case 6 -> perpustakaan.tampilkanSemuaAnggota();
+                    case 7 -> perpustakaan.tampilkanSemuaTransaksi();
+                    case 8 -> perpustakaan.simpanDataKeFile();
+                    case 9 -> perpustakaan.muatDataDariFile();
+                    case 0 -> {
+                        berjalan = false;
+                        System.out.println("Terima kasih, sampai jumpa!");
+                    }
+                    default -> System.out.println("Menu tidak dikenali, coba lagi.");
+                }
+                System.out.println();
+            }
+        }
+    }
+
+    private static void tampilkanMenu() {
+        System.out.println("=== SISTEM PERPUSTAKAAN STEIN ===");
+        System.out.println("1. Tambah Buku");
+        System.out.println("2. Tambah Anggota");
+        System.out.println("3. Pinjam Buku");
+        System.out.println("4. Kembalikan Buku (hitung denda)");
+        System.out.println("5. Tampilkan Semua Buku");
+        System.out.println("6. Tampilkan Semua Anggota");
+        System.out.println("7. Tampilkan Semua Transaksi");
+        System.out.println("8. Simpan Data ke File");
+        System.out.println("9. Muat Data dari File");
+        System.out.println("0. Keluar");
+        System.out.print("Pilih menu: ");
+    }
+
+    private static void tambahBuku(Scanner scanner, Perpustakaan perpustakaan) {
+        System.out.print("Judul buku: ");
+        String judul = scanner.nextLine().trim();
+        System.out.print("Penulis: ");
+        String penulis = scanner.nextLine().trim();
+        System.out.print("Stok: ");
+
+        int stok;
+        try {
+            stok = Integer.parseInt(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Stok harus angka, buku disimpan dengan stok 0.");
+            stok = 0;
+        }
+
+        perpustakaan.tambahBuku(new Buku(judul, penulis, stok));
+    }
+
+    private static void tambahAnggota(Scanner scanner, Perpustakaan perpustakaan) {
+        System.out.print("Tipe anggota (1=Mahasiswa, 2=Dosen): ");
+        String tipe = scanner.nextLine().trim();
+
+        System.out.print("ID anggota: ");
+        String id = scanner.nextLine().trim();
+        System.out.print("Nama: ");
+        String nama = scanner.nextLine().trim();
+    
+        switch (tipe) {
+            case "1" -> {
+                System.out.print("NIM: ");
+                String nim = scanner.nextLine().trim();
+                perpustakaan.tambahAnggota(new Mahasiswa(id, nama, nim));
+            }
+            case "2" -> {
+                System.out.print("NIP: ");
+                String nip = scanner.nextLine().trim();
+                perpustakaan.tambahAnggota(new Dosen(id, nama, nip));
+            }
+            default -> System.out.println("Tipe tidak dikenali, anggota tidak ditambahkan.");
+        }
+    }
+
+    private static void pinjamBuku(Scanner scanner, Perpustakaan perpustakaan) {
+        System.out.print("Kode buku yang dipinjam: ");
+        String kodeBuku = scanner.nextLine().trim();
+        System.out.print("ID anggota peminjam: ");
+        String idAnggota = scanner.nextLine().trim();
+
+        perpustakaan.pinjamBuku(kodeBuku, idAnggota);
+    }
+
+    private static void kembalikanBuku(Scanner scanner, Perpustakaan perpustakaan) {
+        System.out.print("ID transaksi yang dikembalikan (contoh: TRX1): ");
+        String idTransaksi = scanner.nextLine().trim();
+        perpustakaan.kembalikanBuku(idTransaksi);
+    }
+}
